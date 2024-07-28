@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Application</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    body.light-mode {
+        background-color: #fff;
+        color: #000;
+    }
+    body.dark-mode {
+        background-color: #121212;
+        color: #fff;
+    }
+    .container {
+        padding: 20px;
+        max-width: 800px;
+        margin: auto;
+    }
+    .option-block {
+        padding: 10px;
+    }
+    .mark-review {
+        background-color: #f9e79f;
+    }
+    .timer {
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .toggle-btn {
+        cursor: pointer;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body class="light-mode">
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Quiz Application</h2>
+        <div id="timer" class="timer">20:00</div>
+    </div>
+    <div id="quiz">
+        <div id="qid"></div>
+        <div id="question"></div>
+        <div id="question-options"></div>
+        <div class="d-flex justify-content-between mt-3">
+            <button id="previous" class="btn btn-primary">Previous</button>
+            <button id="review" class="btn btn-warning">Mark for Review</button>
+            <button id="next" class="btn btn-primary">Next</button>
+        </div>
+    </div>
+    <button id="mode-toggle" class="btn btn-secondary toggle-btn">Toggle Dark/Light Mode</button>
+    <div id="result"></div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    var quiz = {
+        "JS": [
+            {
+                "id": 1,
+                "question": "Inside which HTML element do we put the JavaScript?",
+                "options": [
+                    { "a": "&lt;script&gt;", "b": "&lt;javascript&gt;", "c": "&lt;scripting&gt;", "d": "&lt;js&gt;" }
+                ],
+                "answer": "&lt;script&gt;",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 2,
+                "question": "What is the correct JavaScript syntax to change the content of the HTML element below?",
+                "options": [
+                    { "a": "document.getElementById(\"demo\").innerHTML = \"Hello World!\";", "b": "#demo.innerHTML = \"Hello World!\";", "c": "document.getElementByName(\"p\").innerHTML = \"Hello World!\";", "d": "document.getElement(\"p\").innerHTML = \"Hello World!\";" }
+                ],
+                "answer": "document.getElementById(\"demo\").innerHTML = \"Hello World!\";",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 3,
+                "question": "Where is the correct place to insert a JavaScript?",
+                "options": [
+                    { "a": "The &lt;head&gt; section", "b": "Both the &lt;head&gt; section and the &lt;body&gt; section are correct", "c": "The &lt;body&gt; section" }
+                ],
+                "answer": "Both the &lt;head&gt; section and the &lt;body&gt; section are correct",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 4,
+                "question": "What is the correct syntax for referring to an external script called \"xxx.js\"?",
+                "options": [
+                    { "a": "&lt;script href=\"xxx.js\"&gt;", "b": "&lt;script name=\"xxx.js\"&gt;", "c": "&lt;script src=\"xxx.js\"&gt;" }
+                ],
+                "answer": "&lt;script src=\"xxx.js\"&gt;",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 5,
+                "question": "The external JavaScript file must contain the &lt;script&gt; tag.",
+                "options": [
+                    { "a": "True", "b": "False" }
+                ],
+                "answer": "False",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 6,
+                "question": "How do you write \"Hello World\" in an alert box?",
+                "options": [
+                    { "a": "msgBox(\"Hello World\");", "b": "alert(\"Hello World\");", "c": "msg(\"Hello World\");", "d": "alertBox(\"Hello World\");" }
+                ],
+                "answer": "alert(\"Hello World\");",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 7,
+                "question": "How do you create a function in JavaScript?",
+                "options": [
+                    { "a": "function = myFunction()", "b": "function:myFunction()", "c": "function myFunction()" }
+                ],
+                "answer": "function myFunction()",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 8,
+                "question": "How do you call a function named \"myFunction\"?",
+                "options": [
+                    { "a": "call function myFunction()", "b": "call myFunction()", "c": "myFunction()" }
+                ],
+                "answer": "myFunction()",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 9,
+                "question": "How to write an IF statement in JavaScript?",
+                "options": [
+                    { "a": "if i = 5 then", "b": "if (i == 5)", "c": "if i == 5 then", "d": "if (i = 5)" }
+                ],
+                "answer": "if (i == 5)",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 10,
+                "question": "How to write an IF statement for executing some code if \"i\" is NOT equal to 5?",
+                "options": [
+                    { "a": "if (i <> 5)", "b": "if i <> 5", "c": "if (i != 5)", "d": "if i =! 5 then" }
+                ],
+                "answer": "if (i != 5)",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 11,
+                "question": "How does a WHILE loop start?",
+                "options": [
+                    { "a": "while (i <= 10; i++)", "b": "while (i <= 10)", "c": "while i = 1 to 10" }
+                ],
+                "answer": "while (i <= 10)",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 12,
+                "question": "How does a FOR loop start?",
+                "options": [
+                    { "a": "for (i = 0; i <= 5)", "b": "for (i = 0; i <= 5; i++)", "c": "for i = 1 to 5", "d": "for (i <= 5; i++)" }
+                ],
+                "answer": "for (i = 0; i <= 5; i++)",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 13,
+                "question": "How can you add a comment in a JavaScript?",
+                "options": [
+                    { "a": "//This is a comment", "b": "'This is a comment", "c": "<!--This is a comment-->" }
+                ],
+                "answer": "//This is a comment",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 14,
+                "question": "How to insert a comment that has more than one line?",
+                "options": [
+                    { "a": "//This comment has more than one line//", "b": "'This comment has more than one line'", "c": "/*This comment has more than one line*/" }
+                ],
+                "answer": "/*This comment has more than one line*/",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 15,
+                "question": "What is the correct way to write a JavaScript array?",
+                "options": [
+                    { "a": "var colors = \"red\",\"green\",\"blue\"", "b": "var colors = (1:\"red\", 2:\"green\", 3:\"blue\")", "c": "var colors = [\"red\", \"green\", \"blue\"]", "d": "var colors = 1 = (\"red\"), 2 = (\"green\"), 3 = (\"blue\")" }
+                ],
+                "answer": "var colors = [\"red\", \"green\", \"blue\"]",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 16,
+                "question": "How do you round the number 7.25, to the nearest integer?",
+                "options": [
+                    { "a": "rnd(7.25)", "b": "Math.rnd(7.25)", "c": "Math.round(7.25)" }
+                ],
+                "answer": "Math.round(7.25)",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 17,
+                "question": "How do you find the number with the highest value of x and y?",
+                "options": [
+                    { "a": "Math.ceil(x, y)", "b": "Math.max(x, y)", "c": "Math.floor(x, y)" }
+                ],
+                "answer": "Math.max(x, y)",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 18,
+                "question": "What is the correct JavaScript syntax for opening a new window called \"w2\" ?",
+                "options": [
+                    { "a": "w2 = window.new(\"http://www.w3schools.com\");", "b": "w2 = window.open(\"http://www.w3schools.com\");" }
+                ],
+                "answer": "w2 = window.open(\"http://www.w3schools.com\");",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 19,
+                "question": "JavaScript is the same as Java.",
+                "options": [
+                    { "a": "True", "b": "False" }
+                ],
+                "answer": "False",
+                "score": 0,
+                "status": ""
+            },
+            {
+                "id": 20,
+                "question": "How can you detect the client's browser name?",
+                "options": [
+                    { "a": "navigator.appName", "b": "client.navName", "c": "browser.name" }
+                ],
+                "answer": "navigator.appName",
+                "score": 0,
+                "status": ""
+            }
+        ]
+    }
+
+    var quizApp = function() {
+        this.score = 0;
+        this.qno = 1;
+        this.currentque = 0;
+        this.totalque = quiz.JS.length;
+
+        this.displayQuiz = function(cque) {
+            this.currentque = cque;
+            if (this.currentque < this.totalque) {
+                $("#qid").html(this.qno + '.');
+                $("#question").html(quiz.JS[this.currentque].question);
+                var options = quiz.JS[this.currentque].options[0];
+                var optionsHtml = '';
+                for (var key in options) {
+                    if (options.hasOwnProperty(key)) {
+                        optionsHtml += '<div class="option-block"><input type="radio" name="option" value="' + options[key] + '"> ' + options[key] + '</div>';
+                    }
+                }
+                $("#question-options").html(optionsHtml);
+            }
+            if (this.currentque <= 0) {
+                $("#previous").attr("disabled", true);
+            } else {
+                $("#previous").attr("disabled", false);
+            }
+            if (this.currentque >= this.totalque - 1) {
+                $("#next").attr("disabled", true);
+            } else {
+                $("#next").attr("disabled", false);
+            }
+        }
+
+        this.checkAnswer = function(option) {
+            if (option == quiz.JS[this.currentque].answer) {
+                if (quiz.JS[this.currentque].score == "") {
+                    quiz.JS[this.currentque].score = 1;
+                    this.score += quiz.JS[this.currentque].score;
+                }
+            }
+        }
+
+        this.changeQuestion = function(cque) {
+            this.qno += cque;
+            this.currentque += cque;
+            this.displayQuiz(this.currentque);
+        }
+
+        this.markForReview = function() {
+            $("#quiz").addClass("mark-review");
+        }
+
+        this.startTimer = function(duration, display) {
+            var timer = duration, minutes, seconds;
+            var interval = setInterval(function() {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    alert("Time's up!");
+                    location.reload();
+                }
+            }, 1000);
+        }
+    }
+
+    var jsq = new quizApp();
+    $(document).ready(function() {
+        jsq.displayQuiz(0);
+        var twentyMinutes = 60 * 20,
+            display = document.querySelector('#timer');
+        jsq.startTimer(twentyMinutes, display);
+
+        $('#previous').click(function(e) {
+            e.preventDefault();
+            jsq.changeQuestion(-1);
+        });
+
+        $('#next').click(function(e) {
+            e.preventDefault();
+            jsq.checkAnswer($('input[name=option]:checked').val());
+            jsq.changeQuestion(1);
+        });
+
+        $('#review').click(function(e) {
+            e.preventDefault();
+            jsq.markForReview();
+        });
+
+        $('#mode-toggle').click(function() {
+            $('body').toggleClass('dark-mode light-mode');
+        });
+    });
+</script>
+</body>
+</html>
